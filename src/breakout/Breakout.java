@@ -1,20 +1,22 @@
 package breakout;
 
 import java.applet.Applet;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.Random;
 
 public class Breakout extends Applet implements Runnable, KeyListener {
     
-    Ball[] ball = new Ball[2];
-    Platform platform;
+    Ball ball;
+    Platform platform[] = new Platform[7];
+    Item item[] = new GravUp[3];
     private Image i;
     private Graphics doubleG;
     Dimension dim = new Dimension(800, 600);
+    private int score;
     
     @Override
     public void init() {
@@ -24,10 +26,16 @@ public class Breakout extends Applet implements Runnable, KeyListener {
     
     @Override
     public void start() {
-        for (int i = 0; i < ball.length; i++) {
-            ball[i] = new Ball((int)(Math.random() * 600), (int)(Math.random() * 400), 8, 20, 2.0, Color.GREEN, 1.0 - (Math.random() * 0.02), 1.0 - (Math.random() * 0.02));
+        ball = new Ball();
+        score = 0;
+        for (int i = 0; i < platform.length; i++) {
+            Random r = new Random();
+            platform[i] = new Platform(getWidth() + 200 * i, getHeight() - 40 - r.nextInt(400));
         }
-
+        for (int i = 0; i < item.length; i++) {
+            Random r = new Random();
+            item[i] = new GravUp(getWidth() + 2000 * i);
+        }
         Thread thread = new Thread(this);
         thread.start();
     }
@@ -45,11 +53,13 @@ public class Breakout extends Applet implements Runnable, KeyListener {
     @Override
     public void run() {
         while (true) {
-            for (int i = 0; i < ball.length; i++) {
-                ball[i].update(this);
+            ball.update(this);
+            for (int i = 0; i < platform.length; i++) {
+                platform[i].update(this, ball);
             }
-            platform = new Platform();
-            platform.update(this);
+            for (int i = 0; i < item.length; i++) {               
+                item[i].update(this, ball);
+            }
             repaint();
             try {
                 Thread.sleep(17); // 60 fps, 1000 (1 sec) / 60 = 17
@@ -76,10 +86,14 @@ public class Breakout extends Applet implements Runnable, KeyListener {
     
     @Override
     public void paint(Graphics g) {
-        for (int i = 0; i < ball.length; i++) {
-            ball[i].paint(g);
+        ball.paint(g);
+        for (int i = 0; i < platform.length; i++) {
+            platform[i].paint(g);
         }
-        platform.paint(g);
+        for (int i = 0; i < item.length; i++) {
+            item[i].paint(g);
+        }
+        g.drawString("SCORE: " + String.valueOf(score), getWidth() / 2, 20);
     }
     
     @Override
@@ -90,15 +104,23 @@ public class Breakout extends Applet implements Runnable, KeyListener {
     public void keyPressed(KeyEvent e) {
         switch(e.getKeyCode()) { // returns integer of key pressed
             case KeyEvent.VK_LEFT:
-                ball[0].moveL();
+                ball.moveL();
                 break;
             case KeyEvent.VK_RIGHT:
-                ball[0].moveR();
+                ball.moveR();
                 break;
         }
     }
 
     @Override
     public void keyReleased(KeyEvent e) {
+    }
+
+    public int getScore() {
+        return score;
+    }
+
+    public void setScore(int score) {
+        this.score = score;
     }
 }

@@ -8,6 +8,7 @@ public class Ball {
     private int y;
     private double dx;
     private double dy;
+    private double gameDy;
     private int radius;
     private double speed;
     private Color color;
@@ -17,7 +18,7 @@ public class Ball {
     private double fX;
     
     public Ball() {
-        this(0, 0, 6, 20, 1.0, Color.GREEN, 0.90, 0.95);
+        this(0, 0, 0, 20, 2.0, Color.GREEN, 1, 1);
     }
     
     public Ball(int x, int y, double dx, int radius, double speed, Color color, double eLoss, double fX) {
@@ -25,6 +26,7 @@ public class Ball {
         this.y = y;
         this.dx = dx;
         dy = 0;
+        gameDy = -75;
         this.radius = radius;
         this.speed = speed;
         this.color = color;
@@ -38,40 +40,90 @@ public class Ball {
         return x;
     }
 
+    public void setX(int x) {
+        this.x = x;
+    }
+    
     public int getY() {
         return y;
     }
 
+    public void setY(int y) {
+        this.y = y;
+    }
+    
     public double getDx() {
         return dx;
     }
 
+    public void setDx(double dx) {
+        this.dx = dx;
+    }
+    
     public double getDy() {
         return dy;
+    }
+
+    public void setDy(double dy) {
+        this.dy = dy;
+    }
+
+    public double getGameDy() {
+        return gameDy;
+    }
+
+    public void setGameDy(double gameDy) {
+        this.gameDy = gameDy;
+    }
+
+    public void setRadius(int radius) {
+        this.radius = radius;
+    }
+
+    public double getSpeed() {
+        return speed;
+    }
+
+    public void setSpeed(double speed) {
+        this.speed = speed;
+    }
+
+    public double getELoss() {
+        return eLoss;
+    }
+    
+    public void seteLoss(double eLoss) {
+        this.eLoss = eLoss;
     }
 
     public double getGravity() {
         return gravity;
     }
-
-    public double getELoss() {
-        return eLoss;
+    
+    public void setGravity(double gravity) {
+        this.gravity = gravity;
     }
 
     public double getfX() {
         return fX;
     }
     
-    
+    public void setfX(double fX) {
+        this.fX = fX;
+    }
+
+    public int getRadius() {
+        return radius;
+    }
     
     public void moveR() {
-        if(dx + 1 < 20) {
+        if(dx + 1 < 10) {
             dx += 1;
         }
     }
     
     public void moveL() {
-        if(dx - 1 > -20) {
+        if(dx - 1 > -10) {
             dx -= 1;
         }
     }
@@ -89,7 +141,7 @@ public class Ball {
         }       
         if(y == bo.getHeight() - radius - 1) { // if at floor level
             dx *= fX; // friction
-            if(Math.abs(dx) < 0.8) { // if dx is small, set it to zero
+            if(Math.abs(dx) < 0.2) { // if dx is small, set it to zero
                 dx = 0;
             }
         }
@@ -97,7 +149,7 @@ public class Ball {
         if(y > bo.getHeight() - radius - 1) {
             y = bo.getHeight() - radius - 1;
             dy *= eLoss;
-            dy = -dy;
+            dy = gameDy;
         } else {
             dy += gravity * dt; // velocity formula
             y += (int)(dy * dt + 0.5 * gravity * dt * dt); // position physics formula
